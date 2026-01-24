@@ -16,10 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Create upload directory if it doesn't exist
         if (!is_dir($uploadDir)) {
-            if (!mkdir($uploadDir, 0755, true)) {
+            $permissions = 0755; // rwxr-xr-x: owner can read/write/execute, group and others can read/execute
+            if (!mkdir($uploadDir, $permissions, true)) {
                 echo 'Failed to create upload directory';
                 exit;
-            }       
+            }
             echo 'Upload directory created successfully<br>';
         }
 
