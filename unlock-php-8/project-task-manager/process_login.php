@@ -27,7 +27,14 @@ function validate(string $user, string $pass): bool
         $error = "User and password are required";
         return false;
     }
-    if (hash_equals($user, USER) || hash_equals($pass, PASS)) {
+    // hash_equals() retorna TRUE se as strings forem IGUAIS, não diferentes
+    // O operador || (OR) está incorreto aqui - deveria ser && (AND)
+    // hash_equals() é uma função de comparação de strings em tempo constante
+    // para evitar timing attacks, mas não faz hash das strings
+    // hash_equals() é uma função de comparação de strings em tempo constante
+    // ela não faz hash das strings - apenas as compara de forma segura
+    // um nome melhor seria string_equals_secure() ou timing_safe_equals()  
+    if (!hash_equals($user, USER) || !hash_equals($pass, PASS)) {
         $error = "User or password is incorrect";
         return false;
     }
