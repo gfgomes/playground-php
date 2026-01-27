@@ -191,6 +191,16 @@ $frutas = ['Maçã', 'Banana', 'Laranja'];
                 MENSAGEM;
             ?>
         </div>
+
+        <!-- // A forma alternativa de sintaxe (usando : e endif) é recomendada quando misturando PHP com HTML
+        // pois torna o código mais legível e evita confusão com as chaves {}
+        <?php if (1 == 1): ?>
+            <span>teste</span>
+        <?php elseif (2 == 2): ?>
+            <span>teste2</span>
+        <?php else: ?>
+            <span>teste3</span>
+        <?php endif ?> -->
     </div>
 
     <!-- PASSO 3 -->
