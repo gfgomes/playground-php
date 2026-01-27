@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entendendo bind_param()</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .exemplo {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+        .codigo {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+            line-height: 1.8;
+        }
+        .destaque {
+            background: #ffd700;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #e0e0e0;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .visual {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .seta {
+            color: #667eea;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Entendendo bind_param("ss", $var1, $var2)</h1>
+
+        <div class="visual">
+            <h2>📊 Visualização:</h2>
+            <pre style="font-size: 18px; line-height: 2;">
+$stmt->bind_param(<span class="destaque">"ss"</span>, $name, $email);
+                   │││   │      │
+                   │││   │      └─ Variável 2
+                   │││   └──────── Variável 1
+                   ││└──────────── Tipo da variável 2
+                   │└───────────── Tipo da variável 1
+                   └────────────── String com os tipos
+            </pre>
+        </div>
+
+        <h2>📚 Tabela de Tipos:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Letra</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                    <th>Exemplo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>s</strong></td>
+                    <td>string</td>
+                    <td>Texto</td>
+                    <td>"João", "email@teste.com"</td>
+                </tr>
+                <tr>
+                    <td><strong>i</strong></td>
+                    <td>integer</td>
+                    <td>Número inteiro</td>
+                    <td>25, 100, -5</td>
+                </tr>
+                <tr>
+                    <td><strong>d</strong></td>
+                    <td>double</td>
+                    <td>Número decimal</td>
+                    <td>19.99, 3.14, 10.5</td>
+                </tr>
+                <tr>
+                    <td><strong>b</strong></td>
+                    <td>blob</td>
+                    <td>Dados binários</td>
+                    <td>Imagem, PDF, arquivo</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>💡 Exemplos Práticos:</h2>
+
+        <!-- EXEMPLO 1 -->
+        <div class="exemplo">
+            <h3>Exemplo 1: Inserir usuário (2 strings)</h3>
+            <div class="codigo">
+$name = "João";<br>
+$email = "joao@email.com";<br>
+<br>
+$stmt = $conn->prepare("INSERT INTO users (name, email) VALUES (?, ?)");<br>
+$stmt->bind_param(<span class="destaque">"ss"</span>, $name, $email);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;││<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│└─ s = string (email)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── s = string (name)
+            </div>
+        </div>
+
+        <!-- EXEMPLO 2 -->
+        <div class="exemplo">
+            <h3>Exemplo 2: Inserir produto (string + número decimal)</h3>
+            <div class="codigo">
+$nome = "Notebook";<br>
+$preco = 2999.90;<br>
+<br>
+$stmt = $conn->prepare("INSERT INTO produtos (nome, preco) VALUES (?, ?)");<br>
+$stmt->bind_param(<span class="destaque">"sd"</span>, $nome, $preco);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;││<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│└─ d = double (preco)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── s = string (nome)
+            </div>
+        </div>
+
+        <!-- EXEMPLO 3 -->
+        <div class="exemplo">
+            <h3>Exemplo 3: Atualizar idade (número inteiro + string)</h3>
+            <div class="codigo">
+$idade = 25;<br>
+$nome = "Maria";<br>
+<br>
+$stmt = $conn->prepare("UPDATE users SET idade = ? WHERE nome = ?");<br>
+$stmt->bind_param(<span class="destaque">"is"</span>, $idade, $nome);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;││<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│└─ s = string (nome)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── i = integer (idade)
+            </div>
+        </div>
+
+        <!-- EXEMPLO 4 -->
+        <div class="exemplo">
+            <h3>Exemplo 4: Pedido completo (4 variáveis de tipos diferentes)</h3>
+            <div class="codigo">
+$cliente = "João";<br>
+$produto_id = 10;<br>
+$quantidade = 3;<br>
+$preco_total = 89.97;<br>
+<br>
+$stmt = $conn->prepare("INSERT INTO pedidos (cliente, produto_id, qtd, total) VALUES (?, ?, ?, ?)");<br>
+$stmt->bind_param(<span class="destaque">"siid"</span>, $cliente, $produto_id, $quantidade, $preco_total);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;││││<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│││└─ d = double (preco_total)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;││└── i = integer (quantidade)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│└─── i = integer (produto_id)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──── s = string (cliente)
+            </div>
+        </div>
+
+        <div class="visual">
+            <h2>🎯 Regra Simples:</h2>
+            <p style="font-size: 18px;">
+                <strong>Número de letras = Número de variáveis</strong>
+            </p>
+            <ul style="font-size: 16px;">
+                <li><code>"ss"</code> = 2 variáveis (ambas strings)</li>
+                <li><code>"si"</code> = 2 variáveis (1 string + 1 inteiro)</li>
+                <li><code>"siid"</code> = 4 variáveis (1 string + 2 inteiros + 1 decimal)</li>
+            </ul>
+        </div>
+
+        <div class="exemplo" style="background: #fff3cd; border-left-color: #ffc107;">
+            <h3>⚠️ Erro Comum:</h3>
+            <div class="codigo" style="background: #ffebee; color: #c62828;">
+// ❌ ERRADO - 2 letras mas 3 variáveis<br>
+$stmt->bind_param("ss", $name, $email, $idade);<br>
+<br>
+// ✅ CORRETO - 3 letras para 3 variáveis<br>
+$stmt->bind_param("ssi", $name, $email, $idade);
+            </div>
+        </div>
+    </div>
+</body>
+</html>
