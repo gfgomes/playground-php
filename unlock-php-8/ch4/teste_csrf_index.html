@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial: Testando CSRF</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 30px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #667eea;
+            margin-top: 30px;
+        }
+        .teste {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+        .teste.vulneravel {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        .teste.protegido {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+        .passo {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .passo strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+        a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            margin: 5px;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background: #5568d3;
+            text-decoration: none;
+        }
+        .btn.danger {
+            background: #dc3545;
+        }
+        .btn.success {
+            background: #28a745;
+        }
+        .resultado {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Tutorial: Testando Ataques CSRF</h1>
+        <p>Aprenda na prática como funciona um ataque CSRF e como a proteção bloqueia!</p>
+
+        <h2>📋 O que você vai testar:</h2>
+        <ul>
+            <li><strong>Cenário 1:</strong> Ataque CSRF em site VULNERÁVEL (ataque funciona ❌)</li>
+            <li><strong>Cenário 2:</strong> Ataque CSRF em site PROTEGIDO (ataque bloqueado ✅)</li>
+        </ul>
+
+        <hr style="margin: 30px 0;">
+
+        <!-- TESTE 1: VULNERÁVEL -->
+        <div class="teste vulneravel">
+            <h2>🔴 Teste 1: Site VULNERÁVEL (sem proteção)</h2>
+            
+            <div class="passo">
+                <strong>Passo 1:</strong> Abra o banco vulnerável em uma aba
+                <br>
+                <a href="http://localhost/playground-php/unlock-php-8/ch4/exemplo_vulneravel_banco.php" target="_blank" class="btn danger">
+                    🏦 Abrir Banco Vulnerável
+                </a>
+            </div>
+
+            <div class="passo">
+                <strong>Passo 2:</strong> Em OUTRA aba, abra o site malicioso
+                <br>
+                <a href="ataque_csrf_vulneravel.html" target="_blank" class="btn danger">
+                    💀 Abrir Site Malicioso
+                </a>
+            </div>
+
+            <div class="passo">
+                <strong>Passo 3:</strong> Clique no botão "RESGATAR AGORA"
+            </div>
+
+            <div class="resultado">
+                <strong>✅ Resultado esperado:</strong> O ataque FUNCIONA! O dinheiro é transferido para "Conta do Hacker" porque não há proteção CSRF.
+            </div>
+        </div>
+
+        <!-- TESTE 2: PROTEGIDO -->
+        <div class="teste protegido">
+            <h2>🟢 Teste 2: Site PROTEGIDO (com token CSRF)</h2>
+            
+            <div class="passo">
+                <strong>Passo 1:</strong> Abra o banco protegido em uma aba
+                <br>
+                <a href="http://localhost/playground-php/unlock-php-8/ch4/exemplo_protegido.php" target="_blank" class="btn success">
+                    🏦 Abrir Banco Protegido
+                </a>
+            </div>
+
+            <div class="passo">
+                <strong>Passo 2:</strong> Em OUTRA aba, abra o site malicioso
+                <br>
+                <a href="ataque_csrf.html" target="_blank" class="btn danger">
+                    💀 Abrir Site Malicioso
+                </a>
+            </div>
+
+            <div class="passo">
+                <strong>Passo 3:</strong> Clique no botão "RESGATAR AGORA"
+            </div>
+
+            <div class="resultado">
+                <strong>🛡️ Resultado esperado:</strong> O ataque é BLOQUEADO! Você verá a mensagem "ATAQUE CSRF BLOQUEADO" porque o token não confere.
+            </div>
+        </div>
+
+        <hr style="margin: 30px 0;">
+
+        <h2>🎓 O que você aprendeu:</h2>
+        <ul>
+            <li><strong>Sem proteção:</strong> Qualquer site pode enviar requisições em seu nome</li>
+            <li><strong>Com token CSRF:</strong> Apenas formulários do seu site têm o token correto</li>
+            <li><strong>O hacker não consegue:</strong> Adivinhar ou roubar o token da sessão</li>
+        </ul>
+
+        <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; margin-top: 30px;">
+            <strong>💡 Dica:</strong> Sempre use tokens CSRF em formulários que executam ações importantes (transferências, alterações de senha, exclusões, etc.)
+        </div>
+    </div>
+</body>
+</html>

