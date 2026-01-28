@@ -3,7 +3,7 @@
 class Person{
     public string $name;
     public int $age;
-
+   
     public function greeting() {
         return "Hello, my name is {$this->name} and I'm {$this->age} years old.";
     }
