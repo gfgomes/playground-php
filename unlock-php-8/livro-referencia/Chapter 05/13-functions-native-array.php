@@ -124,3 +124,9 @@ $fruits = ["c" => "banana", "a" => "apple", "b" => "mango", "d" => "lemon"];
 krsort($fruits);
 print_r($fruits);
 // output: Array ( [d] => lemon [c] => banana [b] => mango [a] => apple )
+
+//Remove values identificated with false em PHP, preserving the original index.
+$arrayValues= [0, 1, 2, '', null, 'PHP', false, '8+'];
+$arrayFiltered= array_filter($arrayValues);
+print_r($arrayFiltered);
+// output: Array ( [1] => 1 [2] => 2 [5] => PHP [7] => 8+ )
