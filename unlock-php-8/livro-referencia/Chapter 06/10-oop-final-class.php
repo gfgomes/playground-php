@@ -4,4 +4,4 @@ final class FinalClass {
 }
 
 //Trying to extend the final class will generate an error
-// class SubClass extends FinalClass {}
+//class SubClass extends FinalClass {}

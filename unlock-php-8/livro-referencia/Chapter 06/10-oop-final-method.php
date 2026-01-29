@@ -7,5 +7,5 @@ class BaseClass {
 
 class SubClass extends BaseClass {
     //Trying to override a final method will generate an error
-    public function finalMethod() {}
+    //public function finalMethod() {}
 }
