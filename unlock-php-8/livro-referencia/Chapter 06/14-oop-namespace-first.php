@@ -1,4 +1,4 @@
-<?php namespace MyProject;
+<?php namespace MyNamespaceB;
 
 class MyClass {
     // Class content
