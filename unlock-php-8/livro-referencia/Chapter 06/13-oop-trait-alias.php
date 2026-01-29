@@ -16,4 +16,8 @@ class MyClass {
         TraitA::hello as sayHelloFromA; // Alias ​​for TraitA method
         TraitB::hello as sayHelloFromB; // Alias ​​for TraitB method
     }
+
+    public function greeting (): void {
+        echo "How are you?";
+    }   
 }

@@ -1,4 +1,8 @@
 <?php
+declare(strict_types=1);
+namespace App;
+
+require_once '../vendor/autoload.php';  // Adicionar esta linha
 include_once 'config_global.php';
 include_once 'process_tasks.php';
 

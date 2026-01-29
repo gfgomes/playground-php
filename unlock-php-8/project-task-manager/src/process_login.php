@@ -1,6 +1,7 @@
 <?php
-
 declare(strict_types=1);
+namespace App;
+
 include_once 'config_global.php';
 
 //global

@@ -1,0 +1,15 @@
+{
+    "name": "gfgomes/project-task-manager",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Gabriel Fernandes Gomes",
+            "email": "gabriel.fgomes@gmail.com"
+        }
+    ],
+    "require": {}
+}

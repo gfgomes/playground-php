@@ -1,4 +1,5 @@
 <?php
+namespace app;
 include_once 'process_tasks_class.php';
 
 if (isset($_POST['task']) && !empty($_POST['task'])) {
