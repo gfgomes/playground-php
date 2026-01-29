@@ -355,7 +355,7 @@ foreach($usuarios as $user) {<br>
                 </tr>
                 <tr style="background: rgba(255,255,255,0.05);">
                     <td><strong>PHP dentro de HTML</strong></td>
-                    <td>✅ Sintaxe Alternativa (<?php if(): ?> ... <?php endif; ?>)</td>
+                <td>✅ Sintaxe Alternativa (&lt;?php if(): ?&gt; ... &lt;?php endif; ?&gt;)</td>
                 </tr>
                 <tr style="background: rgba(255,255,255,0.1);">
                     <td><strong>SQL Queries longas</strong></td>
