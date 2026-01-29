@@ -7,14 +7,14 @@ namespace Composer\Autoload;
 class ComposerStaticInitb68ca874af5a0ee586d568e00a343eb2
 {
     public static $prefixLengthsPsr4 = array (
-        'G' => 
+        'A' => 
         array (
-            'Gfgomes\\ProjectTaskManager\\' => 27,
+            'App\\' => 4,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Gfgomes\\ProjectTaskManager\\' => 
+        'App\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
