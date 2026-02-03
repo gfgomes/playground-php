@@ -10,8 +10,9 @@ abstract class Controller
      *
      * @var string
      */
-    protected ?string $controllerName;
+    protected ?string $controllerName = null;
     private string $controllerViewPath = 'src/Views/';
+    
     public function __construct()
     {
         if (!$this->controllerName) {

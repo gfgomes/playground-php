@@ -1,25 +1,24 @@
-<?php
-include_once 'process_login.php';
-?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= TITLE ?></title>
+    <title><?= $title ?? 'Login' ?></title>
 </head>
 
 <body>
     <h1>Login</h1>
-    <form action="login.php" method="POST">
+
+    <form action="/login/submit" method="POST">
         <input type="text" name="user" placeholder="User" required>
         <input type="password" name="pass" placeholder="*******" required>
         <button type="submit" name="login">login</button>
     </form>
-    <?php if (!empty($error)): ?>
+
+    <?php if (!empty($_GET['error'])): ?>
         <h2>Errors:</h2>
-        <p><?= $error ?></p>
+        <p><?= $_GET['error'] ?></p>
     <?php endif; ?>
 </body>
 

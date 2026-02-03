@@ -8,8 +8,8 @@ class App
 {
     use Singleton;
 
-    public function run(): void
-    {
-        //logic here.
+    public function run(): mixed {
+        $router = Router::instance();
+        return $router->run();
     }
 }
