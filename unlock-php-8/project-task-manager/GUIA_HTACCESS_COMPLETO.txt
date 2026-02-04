@@ -1,0 +1,506 @@
+/**
+ * ============================================================================
+ * GUIA COMPLETO: .htaccess EXPLICADO LINHA POR LINHA
+ * ============================================================================
+ * 
+ * Este guia explica CADA LINHA do arquivo .htaccess de forma didática.
+ */
+
+
+// ============================================================================
+// PARTE 1: O QUE É .htaccess?
+// ============================================================================
+
+/**
+ * .htaccess = "Hypertext Access"
+ * 
+ * É um arquivo de CONFIGURAÇÃO do Apache (servidor web).
+ * 
+ * Permite controlar:
+ * - Redirecionamentos de URL
+ * - Reescrita de URL (URL Rewriting)
+ * - Controle de acesso (senha, IP)
+ * - Configurações de cache
+ * - Páginas de erro personalizadas
+ * - E muito mais!
+ * 
+ * IMPORTANTE:
+ * - O nome DEVE ser exatamente ".htaccess" (com o ponto no início)
+ * - Funciona apenas no Apache (não funciona em Nginx, IIS)
+ * - Afeta o diretório onde está e todos os subdiretórios
+ */
+
+
+// ============================================================================
+// PARTE 2: LINHA POR LINHA DO SEU .htaccess
+// ============================================================================
+
+/**
+ * LINHA 1: <IfModule mod_rewrite.c>
+ * ────────────────────────────────────────────────────────────────────────
+ */
+
+<IfModule mod_rewrite.c>
+
+/**
+ * EXPLICAÇÃO:
+ * 
+ * <IfModule> = Verifica se um módulo do Apache está ativado
+ * mod_rewrite.c = Nome do módulo de reescrita de URLs
+ * 
+ * É como um "if" em PHP:
+ * if (modulo_rewrite_esta_ativado) {
+ *     // executa o código dentro
+ * }
+ * 
+ * POR QUE USAR?
+ * - Se o módulo não estiver ativado, o Apache ignora o código dentro
+ * - Evita erros caso o servidor não tenha mod_rewrite
+ * - Boa prática para compatibilidade
+ * 
+ * ANALOGIA:
+ * É como verificar se um plugin está instalado antes de usá-lo.
+ */
+
+
+/**
+ * LINHA 2: RewriteEngine On
+ * ────────────────────────────────────────────────────────────────────────
+ */
+
+    RewriteEngine On
+
+/**
+ * EXPLICAÇÃO:
+ * 
+ * RewriteEngine = Motor de reescrita de URLs
+ * On = Liga o motor
+ * 
+ * É como ligar um carro antes de dirigir.
+ * Sem isso, as regras de reescrita não funcionam.
+ * 
+ * VALORES POSSÍVEIS:
+ * - On = Ativa a reescrita de URLs
+ * - Off = Desativa a reescrita de URLs
+ * 
+ * ANALOGIA:
+ * É o "interruptor" que liga o sistema de redirecionamento.
+ */
+
+
+/**
+ * LINHA 3: # Comentário
+ * ────────────────────────────────────────────────────────────────────────
+ */
+
+    # Redireciona tudo para index.php, exceto arquivos e diretórios que existem
+
+/**
+ * EXPLICAÇÃO:
+ * 
+ * # = Comentário (igual // em PHP)
+ * 
+ * Tudo após # é ignorado pelo Apache.
+ * Serve apenas para documentar o código.
+ */
+
+
+/**
+ * LINHA 4: RewriteCond %{REQUEST_FILENAME} !-f
+ * ────────────────────────────────────────────────────────────────────────
+ */
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+
+/**
+ * EXPLICAÇÃO DETALHADA:
+ * 
+ * RewriteCond = Rewrite Condition (Condição de Reescrita)
+ * É como um "if" que verifica uma condição antes de aplicar a regra.
+ * 
+ * %{REQUEST_FILENAME} = Variável que contém o caminho completo do arquivo requisitado
+ * 
+ * Exemplo:
+ * URL: http://localhost/project/login
+ * REQUEST_FILENAME = C:/laragon/www/project/login
+ * 
+ * !-f = Negação (!) + teste de arquivo (-f)
+ * -f = verifica se É um arquivo (file)
+ * !-f = verifica se NÃO é um arquivo
+ * 
+ * TRADUÇÃO:
+ * "Se o arquivo requisitado NÃO existe..."
+ * 
+ * EXEMPLOS:
+ * 
+ * URL: http://localhost/project/login
+ * Arquivo: C:/laragon/www/project/login (NÃO existe)
+ * Resultado: !-f = TRUE (condição passa)
+ * 
+ * URL: http://localhost/project/style.css
+ * Arquivo: C:/laragon/www/project/style.css (existe)
+ * Resultado: !-f = FALSE (condição NÃO passa, não redireciona)
+ */
+
+
+/**
+ * LINHA 5: RewriteCond %{REQUEST_FILENAME} !-d
+ * ────────────────────────────────────────────────────────────────────────
+ */
+
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+/**
+ * EXPLICAÇÃO DETALHADA:
+ * 
+ * !-d = Negação (!) + teste de diretório (-d)
+ * -d = verifica se É um diretório (directory)
+ * !-d = verifica se NÃO é um diretório
+ * 
+ * TRADUÇÃO:
+ * "E se o diretório requisitado NÃO existe..."
+ * 
+ * IMPORTANTE:
+ * As duas condições (RewriteCond) são conectadas com AND (E).
+ * Ambas precisam ser TRUE para a regra ser aplicada.
+ * 
+ * LÓGICA:
+ * if (!arquivo_existe AND !diretorio_existe) {
+ *     // aplica a regra de reescrita
+ * }
+ * 
+ * EXEMPLOS:
+ * 
+ * URL: http://localhost/project/login
+ * Arquivo: NÃO existe (!-f = TRUE)
+ * Diretório: NÃO existe (!-d = TRUE)
+ * Resultado: Aplica a regra (redireciona para index.php)
+ * 
+ * URL: http://localhost/project/images/
+ * Arquivo: NÃO existe (!-f = TRUE)
+ * Diretório: EXISTE (!-d = FALSE)
+ * Resultado: NÃO aplica a regra (acessa o diretório normalmente)
+ */
+
+
+/**
+ * LINHA 6: RewriteRule ^(.*)$ index.php [QSA,L]
+ * ────────────────────────────────────────────────────────────────────────
+ */
+
+    RewriteRule ^(.*)$ index.php [QSA,L]
+
+/**
+ * EXPLICAÇÃO DETALHADA:
+ * 
+ * RewriteRule = Regra de Reescrita
+ * Define o que fazer quando as condições são atendidas.
+ * 
+ * Estrutura:
+ * RewriteRule PADRÃO DESTINO [FLAGS]
+ * 
+ * ─────────────────────────────────────────────────────────────────────
+ * PARTE 1: ^(.*)$
+ * ─────────────────────────────────────────────────────────────────────
+ * 
+ * Isso é uma REGEX (Expressão Regular).
+ * 
+ * ^ = Início da string
+ * (.*) = Captura qualquer caractere (.) zero ou mais vezes (*)
+ * $ = Fim da string
+ * 
+ * TRADUÇÃO:
+ * "Captura TUDO da URL"
+ * 
+ * EXEMPLOS:
+ * /login → captura "login"
+ * /users/123 → captura "users/123"
+ * /products/edit/5 → captura "products/edit/5"
+ * 
+ * ─────────────────────────────────────────────────────────────────────
+ * PARTE 2: index.php
+ * ─────────────────────────────────────────────────────────────────────
+ * 
+ * É o DESTINO do redirecionamento.
+ * Todas as URLs que passarem pelas condições serão redirecionadas para index.php.
+ * 
+ * ─────────────────────────────────────────────────────────────────────
+ * PARTE 3: [QSA,L]
+ * ─────────────────────────────────────────────────────────────────────
+ * 
+ * São FLAGS (bandeiras) que modificam o comportamento da regra.
+ * 
+ * QSA = Query String Append
+ * - Mantém os parâmetros da URL original
+ * - Exemplo: /login?redirect=home
+ * - Sem QSA: index.php (perde o ?redirect=home)
+ * - Com QSA: index.php?redirect=home (mantém)
+ * 
+ * L = Last
+ * - Esta é a ÚLTIMA regra a ser processada
+ * - Se esta regra for aplicada, para de processar outras regras
+ * - Melhora a performance
+ */
+
+
+/**
+ * LINHA 7: </IfModule>
+ * ────────────────────────────────────────────────────────────────────────
+ */
+
+</IfModule>
+
+/**
+ * EXPLICAÇÃO:
+ * 
+ * Fecha o bloco <IfModule> que foi aberto na linha 1.
+ * É como fechar uma chave } em PHP.
+ */
+
+
+// ============================================================================
+// PARTE 3: FLUXO COMPLETO COM EXEMPLOS
+// ============================================================================
+
+/**
+ * EXEMPLO 1: Acessando uma rota que não existe fisicamente
+ * ────────────────────────────────────────────────────────────────────────
+ * 
+ * URL digitada: http://localhost/project/login
+ * 
+ * PASSO 1: Apache recebe a requisição
+ * REQUEST_FILENAME = C:/laragon/www/project/login
+ * 
+ * PASSO 2: Verifica se mod_rewrite está ativo
+ * <IfModule mod_rewrite.c> → SIM, está ativo
+ * 
+ * PASSO 3: Liga o motor de reescrita
+ * RewriteEngine On → Motor ligado
+ * 
+ * PASSO 4: Verifica primeira condição
+ * RewriteCond %{REQUEST_FILENAME} !-f
+ * Existe o arquivo C:/laragon/www/project/login? NÃO
+ * !-f = TRUE ✅
+ * 
+ * PASSO 5: Verifica segunda condição
+ * RewriteCond %{REQUEST_FILENAME} !-d
+ * Existe o diretório C:/laragon/www/project/login? NÃO
+ * !-d = TRUE ✅
+ * 
+ * PASSO 6: Aplica a regra
+ * RewriteRule ^(.*)$ index.php [QSA,L]
+ * Captura: "login"
+ * Redireciona para: index.php
+ * 
+ * PASSO 7: Apache executa index.php
+ * PHP processa a rota "/login"
+ * 
+ * RESULTADO: Página de login é exibida ✅
+ */
+
+
+/**
+ * EXEMPLO 2: Acessando um arquivo CSS que existe
+ * ────────────────────────────────────────────────────────────────────────
+ * 
+ * URL digitada: http://localhost/project/style.css
+ * 
+ * PASSO 1: Apache recebe a requisição
+ * REQUEST_FILENAME = C:/laragon/www/project/style.css
+ * 
+ * PASSO 2: Verifica se mod_rewrite está ativo
+ * <IfModule mod_rewrite.c> → SIM, está ativo
+ * 
+ * PASSO 3: Liga o motor de reescrita
+ * RewriteEngine On → Motor ligado
+ * 
+ * PASSO 4: Verifica primeira condição
+ * RewriteCond %{REQUEST_FILENAME} !-f
+ * Existe o arquivo C:/laragon/www/project/style.css? SIM
+ * !-f = FALSE ❌
+ * 
+ * PASSO 5: Condição falhou, NÃO aplica a regra
+ * 
+ * PASSO 6: Apache serve o arquivo normalmente
+ * 
+ * RESULTADO: Arquivo CSS é carregado ✅
+ */
+
+
+/**
+ * EXEMPLO 3: Acessando um diretório que existe
+ * ────────────────────────────────────────────────────────────────────────
+ * 
+ * URL digitada: http://localhost/project/images/
+ * 
+ * PASSO 1: Apache recebe a requisição
+ * REQUEST_FILENAME = C:/laragon/www/project/images/
+ * 
+ * PASSO 2: Verifica se mod_rewrite está ativo
+ * <IfModule mod_rewrite.c> → SIM, está ativo
+ * 
+ * PASSO 3: Liga o motor de reescrita
+ * RewriteEngine On → Motor ligado
+ * 
+ * PASSO 4: Verifica primeira condição
+ * RewriteCond %{REQUEST_FILENAME} !-f
+ * Existe o arquivo C:/laragon/www/project/images/? NÃO (é diretório)
+ * !-f = TRUE ✅
+ * 
+ * PASSO 5: Verifica segunda condição
+ * RewriteCond %{REQUEST_FILENAME} !-d
+ * Existe o diretório C:/laragon/www/project/images/? SIM
+ * !-d = FALSE ❌
+ * 
+ * PASSO 6: Condição falhou, NÃO aplica a regra
+ * 
+ * PASSO 7: Apache lista o conteúdo do diretório
+ * 
+ * RESULTADO: Lista de arquivos é exibida ✅
+ */
+
+
+// ============================================================================
+// PARTE 4: OUTROS TESTES ÚTEIS
+// ============================================================================
+
+/**
+ * TESTES DE CONDIÇÃO DISPONÍVEIS:
+ * 
+ * -f = É um arquivo (file)
+ * -d = É um diretório (directory)
+ * -s = Arquivo existe e tem tamanho > 0 (size)
+ * -l = É um link simbólico (link)
+ * -x = Arquivo é executável (executable)
+ * 
+ * ! = Negação (NOT)
+ * 
+ * EXEMPLOS:
+ * !-f = NÃO é arquivo
+ * !-d = NÃO é diretório
+ * -s = Arquivo existe e não está vazio
+ */
+
+
+// ============================================================================
+// PARTE 5: FLAGS COMUNS
+// ============================================================================
+
+/**
+ * FLAGS MAIS USADAS:
+ * 
+ * [L] = Last
+ * - Última regra, para de processar
+ * 
+ * [R] = Redirect
+ * - Faz redirecionamento HTTP (muda a URL no navegador)
+ * - Exemplo: [R=301] (redirecionamento permanente)
+ * 
+ * [QSA] = Query String Append
+ * - Mantém parâmetros da URL (?param=value)
+ * 
+ * [NC] = No Case
+ * - Ignora maiúsculas/minúsculas
+ * - /Login = /login = /LOGIN
+ * 
+ * [F] = Forbidden
+ * - Retorna erro 403 (acesso negado)
+ * 
+ * EXEMPLOS:
+ * RewriteRule ^(.*)$ index.php [QSA,L]
+ * RewriteRule ^old-page$ new-page [R=301,L]
+ * RewriteRule ^admin - [F,L]
+ */
+
+
+// ============================================================================
+// PARTE 6: VARIÁVEIS ÚTEIS
+// ============================================================================
+
+/**
+ * VARIÁVEIS DO APACHE:
+ * 
+ * %{REQUEST_FILENAME} = Caminho completo do arquivo
+ * %{REQUEST_URI} = URI requisitada (/project/login)
+ * %{HTTP_HOST} = Domínio (localhost)
+ * %{QUERY_STRING} = Parâmetros da URL (?id=5)
+ * %{REMOTE_ADDR} = IP do visitante
+ * %{HTTP_USER_AGENT} = Navegador do visitante
+ * 
+ * EXEMPLO DE USO:
+ * RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+ * RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+ * (Remove www do domínio)
+ */
+
+
+// ============================================================================
+// PARTE 7: RESUMO FINAL
+// ============================================================================
+
+/**
+ * O QUE O SEU .htaccess FAZ:
+ * 
+ * 1. Verifica se mod_rewrite está ativo
+ * 2. Liga o motor de reescrita
+ * 3. Para cada requisição:
+ *    a. Verifica se o arquivo NÃO existe
+ *    b. Verifica se o diretório NÃO existe
+ *    c. Se ambos NÃO existem:
+ *       - Redireciona para index.php
+ *       - Mantém os parâmetros da URL
+ *       - Para de processar outras regras
+ * 
+ * RESULTADO:
+ * - URLs amigáveis funcionam (/login, /products, etc.)
+ * - Arquivos reais são servidos normalmente (CSS, JS, imagens)
+ * - Diretórios reais são acessados normalmente
+ * - Tudo passa pelo index.php (Front Controller Pattern)
+ */
+
+
+// ============================================================================
+// PARTE 8: TESTANDO O .htaccess
+// ============================================================================
+
+/**
+ * COMO TESTAR:
+ * 
+ * 1. Acesse: http://localhost/project/login
+ *    Resultado esperado: Página de login (via index.php)
+ * 
+ * 2. Acesse: http://localhost/project/style.css
+ *    Resultado esperado: Arquivo CSS carregado
+ * 
+ * 3. Acesse: http://localhost/project/rota-inexistente
+ *    Resultado esperado: Página 404 (via index.php)
+ * 
+ * 4. Acesse: http://localhost/project/
+ *    Resultado esperado: Home page (via index.php)
+ */
+
+
+// ============================================================================
+// PARTE 9: TROUBLESHOOTING
+// ============================================================================
+
+/**
+ * PROBLEMAS COMUNS:
+ * 
+ * 1. "Internal Server Error 500"
+ *    - Sintaxe errada no .htaccess
+ *    - Verifique se não tem erros de digitação
+ * 
+ * 2. ".htaccess não funciona"
+ *    - mod_rewrite não está ativado
+ *    - AllowOverride está desabilitado
+ *    - Verifique a configuração do Apache
+ * 
+ * 3. "Arquivos CSS/JS não carregam"
+ *    - Verifique se as condições !-f e !-d estão corretas
+ *    - Verifique o caminho dos arquivos
+ * 
+ * 4. "Redirecionamento infinito"
+ *    - Falta a flag [L]
+ *    - Regra está redirecionando para si mesma
+ */

@@ -3,13 +3,12 @@
 namespace App\System;
 
 use App\Traits\Singleton;
-
 class App
 {
     use Singleton;
 
     protected $middlewares = [
-        \App\Middleware\Authentication::class,
+        \App\Middlewares\Authentication::class,
         // ... other middleware you can add in the future
     ];
 
