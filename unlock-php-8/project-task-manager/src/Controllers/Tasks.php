@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Controllers;
 
 use App\Models\Task;
@@ -15,6 +14,7 @@ class Tasks extends Controller
         parent::__construct();
         $this->taskModel = new Task;
     }
+    
     public function index(array $data = [], string | null $layout = null): string|false
     {
         return parent::index([
@@ -63,7 +63,8 @@ class Tasks extends Controller
         }
     }
 
-    public function onDeleteAll(): void{
+    public function onDeleteAll(): void
+    {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return;
         }
@@ -78,9 +79,4 @@ class Tasks extends Controller
             ]);
         }
     }
-
-
-    
-
-
 }
