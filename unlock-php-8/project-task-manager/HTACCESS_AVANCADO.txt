@@ -1,0 +1,445 @@
+/**
+ * ============================================================================
+ * .HTACCESS AVANÇADO: MÚLTIPLAS REGRAS E CENÁRIOS COMPLEXOS
+ * ============================================================================
+ */
+
+
+// ============================================================================
+// CONCEITO IMPORTANTE: ORDEM DAS REGRAS
+// ============================================================================
+
+/**
+ * O Apache processa as regras DE CIMA PARA BAIXO.
+ * 
+ * Quando encontra uma regra com flag [L] (Last), PARA de processar.
+ * 
+ * ANALOGIA:
+ * É como um switch/case em PHP:
+ * - Testa cada caso na ordem
+ * - Quando encontra um match, executa e para (se tiver break)
+ */
+
+
+// ============================================================================
+// EXEMPLO 1: BLOQUEANDO ACESSO À ÁREA DE ADMIN
+// ============================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 1: Bloquear acesso direto à pasta admin
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_URI} ^/admin
+    RewriteCond %{REMOTE_ADDR} !^192\.168\.1\.100$
+    RewriteRule ^(.*)$ - [F,L]
+    
+    # EXPLICAÇÃO:
+    # Se a URL começa com /admin
+    # E o IP NÃO é 192.168.1.100
+    # Retorna erro 403 Forbidden [F]
+    # E para de processar [L]
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 2: Redirecionar tudo para index.php (exceto arquivos reais)
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+/**
+ * FLUXO:
+ * 
+ * URL: /admin/users
+ * IP: 192.168.1.50
+ * ↓
+ * REGRA 1: Começa com /admin? SIM
+ * REGRA 1: IP é 192.168.1.100? NÃO
+ * REGRA 1: Bloqueia com 403 [F,L]
+ * ↓
+ * PARA (não processa REGRA 2)
+ * 
+ * ────────────────────────────────────────────────────────────────────
+ * 
+ * URL: /admin/users
+ * IP: 192.168.1.100
+ * ↓
+ * REGRA 1: Começa com /admin? SIM
+ * REGRA 1: IP é 192.168.1.100? SIM
+ * REGRA 1: NÃO bloqueia (condição falhou)
+ * ↓
+ * REGRA 2: Arquivo existe? NÃO
+ * REGRA 2: Redireciona para index.php
+ */
+
+
+// ============================================================================
+// EXEMPLO 2: FORÇAR HTTPS
+// ============================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 1: Redirecionar HTTP para HTTPS
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+    
+    # EXPLICAÇÃO:
+    # Se HTTPS está desligado (HTTP)
+    # Redireciona para HTTPS
+    # [R=301] = Redirecionamento permanente
+    # [L] = Para de processar
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 2: Redirecionar para index.php
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+/**
+ * FLUXO:
+ * 
+ * URL: http://site.com/login
+ * ↓
+ * REGRA 1: HTTPS está off? SIM
+ * REGRA 1: Redireciona para https://site.com/login [R=301,L]
+ * ↓
+ * PARA (navegador faz nova requisição com HTTPS)
+ * 
+ * ────────────────────────────────────────────────────────────────────
+ * 
+ * URL: https://site.com/login (após redirecionamento)
+ * ↓
+ * REGRA 1: HTTPS está off? NÃO
+ * REGRA 1: NÃO redireciona
+ * ↓
+ * REGRA 2: Arquivo existe? NÃO
+ * REGRA 2: Redireciona para index.php
+ */
+
+
+// ============================================================================
+// EXEMPLO 3: REMOVER WWW DO DOMÍNIO
+// ============================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 1: Remover www
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+    
+    # EXPLICAÇÃO:
+    # Se o domínio começa com www.
+    # [NC] = No Case (ignora maiúsculas/minúsculas)
+    # %1 = Captura o que vem depois de www. (site.com)
+    # $1 = Captura o caminho da URL (/login)
+    # Redireciona para: http://site.com/login
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 2: Redirecionar para index.php
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+/**
+ * FLUXO:
+ * 
+ * URL: http://www.site.com/login
+ * ↓
+ * REGRA 1: Domínio começa com www? SIM
+ * REGRA 1: Captura: %1 = site.com, $1 = login
+ * REGRA 1: Redireciona para http://site.com/login [R=301,L]
+ * ↓
+ * PARA
+ * 
+ * ────────────────────────────────────────────────────────────────────
+ * 
+ * URL: http://site.com/login (após redirecionamento)
+ * ↓
+ * REGRA 1: Domínio começa com www? NÃO
+ * ↓
+ * REGRA 2: Redireciona para index.php
+ */
+
+
+// ============================================================================
+// EXEMPLO 4: MÚLTIPLAS ÁREAS COM DIFERENTES TRATAMENTOS
+// ============================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 1: API - Redirecionar para api.php
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_URI} ^/api/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^api/(.*)$ api.php?route=$1 [QSA,L]
+    
+    # EXPLICAÇÃO:
+    # Se a URL começa com /api/
+    # E o arquivo não existe
+    # Redireciona para api.php?route=...
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 2: Admin - Redirecionar para admin.php
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_URI} ^/admin/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^admin/(.*)$ admin.php?route=$1 [QSA,L]
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 3: Resto - Redirecionar para index.php
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+/**
+ * FLUXO:
+ * 
+ * URL: /api/users/123
+ * ↓
+ * REGRA 1: Começa com /api/? SIM
+ * REGRA 1: Arquivo existe? NÃO
+ * REGRA 1: Redireciona para api.php?route=users/123 [L]
+ * ↓
+ * PARA
+ * 
+ * ────────────────────────────────────────────────────────────────────
+ * 
+ * URL: /admin/products
+ * ↓
+ * REGRA 1: Começa com /api/? NÃO
+ * ↓
+ * REGRA 2: Começa com /admin/? SIM
+ * REGRA 2: Arquivo existe? NÃO
+ * REGRA 2: Redireciona para admin.php?route=products [L]
+ * ↓
+ * PARA
+ * 
+ * ────────────────────────────────────────────────────────────────────
+ * 
+ * URL: /login
+ * ↓
+ * REGRA 1: Começa com /api/? NÃO
+ * ↓
+ * REGRA 2: Começa com /admin/? NÃO
+ * ↓
+ * REGRA 3: Arquivo existe? NÃO
+ * REGRA 3: Redireciona para index.php [L]
+ */
+
+
+// ============================================================================
+// EXEMPLO 5: BLOQUEAR ARQUIVOS SENSÍVEIS
+// ============================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 1: Bloquear acesso a arquivos .env, .git, etc.
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteRule ^(.*/)?\.env$ - [F,L]
+    RewriteRule ^(.*/)?\.git - [F,L]
+    RewriteRule ^(.*/)?composer\.(json|lock)$ - [F,L]
+    
+    # EXPLICAÇÃO:
+    # Se a URL termina com .env
+    # Ou contém .git
+    # Ou termina com composer.json ou composer.lock
+    # Bloqueia com 403 [F]
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 2: Redirecionar para index.php
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+
+// ============================================================================
+// EXEMPLO 6: REDIRECIONAMENTOS DE PÁGINAS ANTIGAS
+// ============================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 1: Redirecionar páginas antigas
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteRule ^old-page$ /new-page [R=301,L]
+    RewriteRule ^products/old-category$ /products/new-category [R=301,L]
+    
+    # EXPLICAÇÃO:
+    # Se acessar /old-page
+    # Redireciona permanentemente para /new-page
+    # [R=301] = Redirecionamento permanente (SEO friendly)
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # REGRA 2: Redirecionar para index.php
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+
+// ============================================================================
+// EXEMPLO 7: COMBINANDO TUDO (EXEMPLO REAL)
+// ============================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # 1. Forçar HTTPS
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # 2. Remover www
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # 3. Bloquear arquivos sensíveis
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteRule ^(.*/)?\.env$ - [F,L]
+    RewriteRule ^(.*/)?\.git - [F,L]
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # 4. Bloquear acesso direto ao admin (exceto IP específico)
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_URI} ^/admin
+    RewriteCond %{REMOTE_ADDR} !^192\.168\.1\.100$
+    RewriteRule ^(.*)$ - [F,L]
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # 5. API - Redirecionar para api.php
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_URI} ^/api/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^api/(.*)$ api.php?route=$1 [QSA,L]
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # 6. Redirecionamentos de páginas antigas
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteRule ^old-page$ /new-page [R=301,L]
+    
+    # ─────────────────────────────────────────────────────────────────────
+    # 7. Redirecionar tudo para index.php (Front Controller)
+    # ─────────────────────────────────────────────────────────────────────
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+/**
+ * FLUXO COMPLETO:
+ * 
+ * URL: http://www.site.com/admin/users
+ * IP: 192.168.1.50
+ * ↓
+ * REGRA 1: HTTPS off? SIM → Redireciona para https://www.site.com/admin/users [L]
+ * PARA
+ * 
+ * ────────────────────────────────────────────────────────────────────
+ * 
+ * URL: https://www.site.com/admin/users (após redirecionamento)
+ * IP: 192.168.1.50
+ * ↓
+ * REGRA 1: HTTPS off? NÃO
+ * ↓
+ * REGRA 2: Tem www? SIM → Redireciona para https://site.com/admin/users [L]
+ * PARA
+ * 
+ * ────────────────────────────────────────────────────────────────────
+ * 
+ * URL: https://site.com/admin/users (após redirecionamento)
+ * IP: 192.168.1.50
+ * ↓
+ * REGRA 1: HTTPS off? NÃO
+ * ↓
+ * REGRA 2: Tem www? NÃO
+ * ↓
+ * REGRA 3: É .env ou .git? NÃO
+ * ↓
+ * REGRA 4: Começa com /admin? SIM
+ * REGRA 4: IP é 192.168.1.100? NÃO
+ * REGRA 4: Bloqueia com 403 [F,L]
+ * PARA
+ * 
+ * RESULTADO: Acesso negado (403 Forbidden)
+ */
+
+
+// ============================================================================
+// DICAS IMPORTANTES
+// ============================================================================
+
+/**
+ * 1. ORDEM IMPORTA!
+ *    - Coloque regras mais específicas ANTES das genéricas
+ *    - Exemplo: Bloquear admin ANTES de redirecionar para index.php
+ * 
+ * 2. USE [L] (Last)
+ *    - Sempre use [L] quando quiser parar de processar
+ *    - Evita conflitos entre regras
+ * 
+ * 3. TESTE UMA REGRA POR VEZ
+ *    - Adicione regras gradualmente
+ *    - Teste cada uma antes de adicionar a próxima
+ * 
+ * 4. CUIDADO COM LOOPS INFINITOS
+ *    - Se redirecionar para si mesmo, causa loop
+ *    - Use condições para evitar isso
+ * 
+ * 5. BACKUP SEMPRE
+ *    - Faça backup do .htaccess antes de modificar
+ *    - Um erro pode derrubar o site inteiro
+ * 
+ * 6. TESTE EM DESENVOLVIMENTO PRIMEIRO
+ *    - Nunca teste em produção
+ *    - Use ambiente local (Laragon, XAMPP, etc.)
+ */
+
+
+// ============================================================================
+// RESUMO
+// ============================================================================
+
+/**
+ * SEU .HTACCESS BÁSICO É PERFEITO PARA COMEÇAR!
+ * 
+ * <IfModule mod_rewrite.c>
+ *     RewriteEngine On
+ *     RewriteCond %{REQUEST_FILENAME} !-f
+ *     RewriteCond %{REQUEST_FILENAME} !-d
+ *     RewriteRule ^(.*)$ index.php [QSA,L]
+ * </IfModule>
+ * 
+ * Quando precisar de mais funcionalidades:
+ * - Adicione regras ANTES da regra final (index.php)
+ * - Use [L] para parar o processamento
+ * - Teste uma regra por vez
+ * 
+ * Para 99% dos projetos simples, o .htaccess básico é suficiente!
+ * Só adicione complexidade quando realmente precisar.
+ */
