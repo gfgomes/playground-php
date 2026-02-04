@@ -19,4 +19,9 @@ class View
         }
         return \ob_get_clean();
     }
+
+    public static function renderWithLayout(string $viewFile, array $variables = [], string $layout = 'layouts/index.php') : string|false {
+        $content = self::render($viewFile, $variables);
+        return self::render($layout, ['contentLayout' => $content] + $variables); // merges content and other variables
+    }
 }

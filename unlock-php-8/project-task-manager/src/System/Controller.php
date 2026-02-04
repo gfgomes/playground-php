@@ -12,7 +12,7 @@ abstract class Controller
      */
     protected ?string $controllerName = null;
     private string $controllerViewPath = 'src/Views/';
-    
+
     public function __construct()
     {
         if (!$this->controllerName) {
@@ -24,21 +24,30 @@ abstract class Controller
         $viewPath = $this->controllerViewPath . $this->controllerName . '/index.php';
         return $this->render($viewPath, $data);
     }
-    protected function render(string $viewPath, array $data = []): string|false
+    
+    protected function render(string $viewPath, array $data = [], bool $useLayout = true, string $layout = 'layouts/index.php'): string|false
     {
         try {
+            if ($useLayout) {
+                return View::renderWithLayout($viewPath, $data, $layout);
+            }
             return View::render($viewPath, $data);
         } catch (\Throwable $th) {
-            return $this->renderError($th);
+            return $this->renderError($th, $useLayout ? $layout : null);
         }
     }
-    protected function renderError(\Throwable $exception): string|false
+    protected function renderError(\Throwable $exception, string|null $layout = null): string|false
     {
         $viewErrorPath = $this->controllerViewPath . 'error/index.php';
         $viewError = [
             'error' => $exception->getMessage(),
             'error_full' => $exception->getTraceAsString(),
         ];
+
+        if ($layout) {
+            return View::renderWithLayout($viewErrorPath, $viewError, $layout);
+        }
+
         return View::render($viewErrorPath, $viewError);
     }
 }
