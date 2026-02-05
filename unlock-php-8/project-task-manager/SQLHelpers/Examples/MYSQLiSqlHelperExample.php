@@ -5,7 +5,7 @@ namespace App\Examples;
 use App\System\MYSQLiSqlHelper;
 use mysqli;
 
-class SqlHelperExample
+class MYSQLiSqlHelperExample
 {
     private MYSQLiSqlHelper $sql;
 
