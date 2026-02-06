@@ -1,1 +1,1 @@
-http://localhost/playground-php/unlock-php-8/project-task-manager/src/
+http://localhost/playground-php/unlock-php-8/project-task-manager/
