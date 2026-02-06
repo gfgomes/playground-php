@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Models\Task;
@@ -14,11 +15,13 @@ class Tasks extends Controller
         parent::__construct();
         $this->taskModel = new Task;
     }
-    
+
     public function index(array $data = [], string | null $layout = null): string|false
     {
         return parent::index([
-            'tasks' => $this->taskModel->tasks
+            'tasks' => $this->taskModel
+                ->where('user_id', '=', $_SESSION['userId'])
+                ->all(),
         ]);
     }
 
@@ -29,8 +32,11 @@ class Tasks extends Controller
         }
         try {
             $payload = [
-                'task' => ucfirst($_POST['task']),
-                'completed' => false,
+                'title' => ucfirst($_POST['task']),
+                'user_id' =>  $_SESSION['userId'],
+                'is_concluded' => 0,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
             ];
             $this->taskModel->createTask($payload);
             Redirect::to('/tasks', [
@@ -52,7 +58,15 @@ class Tasks extends Controller
             if (!method_exists($this->taskModel, $_POST['action'])) {
                 throw new \Exception('Method does not exist in the Tasks model');
             }
-            $this->taskModel->{$_POST['action']}($_POST['index']);
+            
+            // Corrigido: usar 'id' em vez de 'index'
+            $taskId = (int) $_POST['id'];
+            
+            if ($taskId <= 0) {
+                throw new \Exception('Invalid task ID');
+            }
+            
+            $this->taskModel->{$_POST['action']}($taskId);
             Redirect::to('/tasks', [
                 'success' => 'Task updated successfully'
             ]);

@@ -17,25 +17,24 @@
     <h2>New Task Added:</h2>
     <?php foreach ($tasks as $index => $task): ?>
         <li style="margin-bottom: 5px">
-            <?= $task['task']; ?>
-            <?php if (!$task['completed']): ?>
+            <?= $task->title; ?>
+            <?php if(!$task->is_concluded): ?>
                 <form action="<?= url('/tasks/completed')  ?>" method="POST" style="display: inline;">
-                    <input type="hidden" name="index" value="<?php echo $index; ?>">
+                    <input type="hidden" name="id" value="<?= $task->id ?>">
                     <input type="hidden" name="action" value="markTaskAsCompleted">
                     <button type="submit" name="completed">Mark completed</button>
                 </form>
             <?php else: ?>
                 <strong style="color:green">concluded</strong>
             <?php endif; ?>
-            <form action="<?= url('/tasks/delete')  ?>" method="POST" style="display: inline;">
-                <input type="hidden" name="index" value="<?php echo $index; ?>">
-                <input type="hidden" name="action" value="deleteTaskByIndex">
+            <form action="<?= url('/tasks/delete-all')  ?>" method="POST" style="margin-top: 25px;">
+                <input type="hidden" name="id" value="<?= $task->id ?>">
+                <input type="hidden" name="action" value="deleteTaskById">
                 <button type="submit" name="delete">delete</button>
             </form>
         </li>
     <?php endforeach; ?>
-
-    <form action="<?= url('/tasks/delete-all')  ?>" method="POST" style="margin-top: 25px;">
+    <form action="/tasks/delete-all" method="POST" style="margin-top: 25px;">
         <button type="submit" name="clear">Clear All</button>
     </form>
 <?php endif; ?>

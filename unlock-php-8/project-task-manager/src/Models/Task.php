@@ -2,43 +2,29 @@
 
 namespace App\Models;
 
-class Task
+use App\System\Model;
+
+class Task extends Model
 {
-    public function __get(string $property)
+    public string $table = 'tasks';
+    public bool $softDelete = true;
+    public function createTask(array $data): bool
     {
-        if ($property === 'tasks') {
-            return $_SESSION[$property] ?? [];
-        }
-        throw new \Exception('Property does not exist');
+        return $this->create($data);
     }
-
-    public function createTask(array $data): void
+    public function markTaskAsCompleted(int $id): bool
     {
-        $tasks = $this->tasks;
-        $tasks[] = $data;
-        $_SESSION['tasks'] = $tasks;
+        return $this->where('id', '=', $id)->update([
+            'is_concluded' => 1,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
     }
-
-    public function markTaskAsCompleted(int $index): void
+    public function deleteTaskById(int $id): bool
     {
-        $tasks = $this->tasks;
-        if (isset($tasks[$index])) {
-            $tasks[$index]['completed'] = true;
-            $_SESSION['tasks'] = $tasks;
-        }
+        return $this->where('id', '=', $id)->delete();
     }
-
-    public function deleteTaskByIndex(int $index): void
+    public function clearAllTasks(): bool
     {
-        $tasks = $_SESSION['tasks'];
-        if (isset($tasks[$index])) {
-            unset($tasks[$index]);
-            $_SESSION['tasks'] = $tasks;
-        }
-    }
-    public function clearAllTasks(): void
-    {
-        //unset = destroys the specified variable/value
-        unset($_SESSION['tasks']);
+        return $this->delete();
     }
 }
